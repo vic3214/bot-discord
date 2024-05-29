@@ -33,7 +33,7 @@ function manageErrors(error) {
 }
 
 function getPlayerInformation(playerTag) {
-  const url = process.env.URL_API + `players/${clanTag}`;
+  const url = process.env.URL_API + `players/${encodeURIComponent(clanTag)}`;
   return fetch(url, header)
     .then((response) => response.json())
     .then((data) => {

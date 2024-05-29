@@ -1,7 +1,5 @@
 // All posibles clash of clans API requests for clans
 
-//TODO: Add encodeUri to all fetch functions
-
 const header = {
   method: "GET",
   headers: {
@@ -35,7 +33,9 @@ function manageErrors(error) {
 }
 
 function getLeagueGroup(clanTag) {
-  const url = process.env.URL_API + `clans/${clanTag}/currentwar/leaguegroup`;
+  const url =
+    process.env.URL_API +
+    `clans/${encodeURIComponent(clanTag)}/currentwar/leaguegroup`;
   return fetch(url, header)
     .then((response) => response.json())
     .then((data) => {
@@ -47,7 +47,8 @@ function getLeagueGroup(clanTag) {
 }
 
 function getClanWarInformation(warTag) {
-  const url = process.env.URL_API + `clanwarleagues/wars/${warTag}`;
+  const url =
+    process.env.URL_API + `clanwarleagues/wars/${encodeURIComponent(warTag)}`;
   return fetch(url, header)
     .then((response) => response.json())
     .then((data) => {
@@ -59,7 +60,8 @@ function getClanWarInformation(warTag) {
 }
 
 function getClanWarLog(clanTag) {
-  const url = process.env.URL_API + `clans/${clanTag}/warlog`;
+  const url =
+    process.env.URL_API + `clans/${encodeURIComponent(clanTag)}/warlog`;
   return fetch(url, header)
     .then((response) => response.json())
     .then((data) => {
@@ -71,7 +73,8 @@ function getClanWarLog(clanTag) {
 }
 
 function searchClan(search) {
-  const url = process.env.URL_API + `clans?search=${search}`;
+  const url =
+    process.env.URL_API + `clans?search=${encodeURIComponent(search)}`;
   return fetch(url, header)
     .then((response) => response.json())
     .then((data) => {
@@ -83,7 +86,8 @@ function searchClan(search) {
 }
 
 function getCurrentWarInformation(clanTag) {
-  const url = process.env.URL_API + `clans/${clanTag}/currentwar`;
+  const url =
+    process.env.URL_API + `clans/${encodeURIComponent(clanTag)}/currentwar`;
   return fetch(url, header)
     .then((response) => response.json())
     .then((data) => {
@@ -95,7 +99,7 @@ function getCurrentWarInformation(clanTag) {
 }
 
 function getClanInformation(clanTag) {
-  const url = process.env.URL_API + `clans/${clanTag}`;
+  const url = process.env.URL_API + `clans/${encodeURIComponent(clanTag)}`;
   return fetch(url, header)
     .then((response) => response.json())
     .then((data) => {
@@ -108,23 +112,22 @@ function getClanInformation(clanTag) {
 
 function getClanMembers(clanTag) {
   const url =
-    process.env.URL_API +
-    `clans/${encodeURIComponent(clanTag)}/members?limit=50`;
+    process.env.URL_API + `clans/${encodeURIComponent(clanTag)}/members`;
   console.log(`URL ${url}`);
   return fetch(url, header)
     .then((response) => response.json())
     .then((data) => {
-      console.log("data", data);
       return data;
     })
     .catch((error) => {
-      console.log("error", error);
       return manageErrors(error);
     });
 }
 
 function getCapitalRaidSeasons(clanTag) {
-  const url = process.env.URL_API + `clans/${clanTag}/capitalraidseasons`;
+  const url =
+    process.env.URL_API +
+    `clans/${encodeURIComponent(clanTag)}/capitalraidseasons`;
   return fetch(url, header)
     .then((response) => response.json())
     .then((data) => {

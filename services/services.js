@@ -1,4 +1,4 @@
-const clans_services = require("./clans");
-const players_services = require("./players");
+const clans_services = require("./clansService");
+const players_services = require("./playersService");
 
 module.exports = { clans_services, players_services };
