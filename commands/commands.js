@@ -32,6 +32,22 @@ const commandHandlers = {
     handler: async () =>
       await controllers.clansControllers.getAllMembersCapitalContribution(),
   },
+  "!heroes": {
+    description:
+      "Lista de los miembros y el nivel de sus heroes, K -> Rey, Q -> Reina, C -> Centinela, L -> Luchadora, Si no aparece es que no lo tiene",
+    handler: async () =>
+      await controllers.playersControllers.getHerosLevelsForAllMembers(),
+  },
+  "!puntos": {
+    description: "Lista de los miembros y sus puntos",
+    handler: async () =>
+      await controllers.playersControllers.getClanMembersPointsTable(),
+  },
+  "!guerra": {
+    description: "Información sobre la guerra actual",
+    handler: async () =>
+      await controllers.clansControllers.getCurrentWarInformation(),
+  },
 };
 
 function commandsHelp() {

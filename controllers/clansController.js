@@ -1,5 +1,6 @@
 const services = require("../services/services");
 const fs = require("fs");
+const moment = require("moment");
 
 async function getClanMemebersListOrderByTrophiesDescendent() {
   let response_message = "";
@@ -117,10 +118,46 @@ async function getAllMembersCapitalContribution() {
   return response_message;
 }
 
+async function getCurrentWarInformation() {
+  let response_message = "";
+  try {
+    const currentWar = await services.clans_services.getCurrentWarInformation(
+      process.env.CLAN_TAG
+    );
+
+    // Order war memebers by mapPosition
+
+    currentWar.clan.members.sort((a, b) => a.mapPosition - b.mapPosition);
+    const warMembers = currentWar.clan.members.map((member) => member.name);
+
+    response_message = `Comienzo ->  ${formatDate(
+      currentWar.startTime
+    )}  /   Final ->  ${formatDate(currentWar.endTime)}  (hora Española)\n\n`;
+    response_message += `El clani  ${currentWar.clan.stars} ⭐  -  ${currentWar.opponent.stars} ⭐  ${currentWar.opponent.name} \n\n`;
+    response_message += `El clani  ${currentWar.clan.destructionPercentage}% destruido  -  ${currentWar.opponent.name}  ${currentWar.opponent.destructionPercentage}% destruido \n\n`;
+    response_message += `El clani  ${currentWar.clan.attacks} ataques  -  ${currentWar.opponent.name}  ${currentWar.opponent.attacks} ataques\n\n`;
+    response_message += `Alineación:  ${warMembers.join(", ")}`;
+  } catch (error) {
+    response_message = error.message;
+  }
+
+  return response_message;
+}
+
+function formatDate(dateString) {
+  try {
+    const date = moment.utc(dateString, "YYYYMMDDTHHmmss.SSSZ");
+    return date.format("LL, LT");
+  } catch (error) {
+    throw new Error("Invalid date string format");
+  }
+}
+
 module.exports = {
   getClanMemebersListOrderByTrophiesDescendent,
   getClanMembersListAlphabeticalOrderByNameDescendent,
   getClanDonationsDifference,
   chooseInsult,
   getAllMembersCapitalContribution,
+  getCurrentWarInformation,
 };
