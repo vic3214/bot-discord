@@ -1,6 +1,5 @@
-const controllers = require("./controllers/controllers");
-
 const { Client, Events } = require("discord.js");
+const commandHandlers = require("./commands/commands");
 
 const client = new Client({
   intents: 3276799,
@@ -13,24 +12,8 @@ client.on(Events.ClientReady, async () => {
 client.on(Events.MessageCreate, async (message) => {
   let response_message = "";
 
-  if (message.content === "!miembros") {
-    response_message = await controllers.clansControllers.getClanMemebersList();
-  }
-
-  if (message.content === "!donaciones") {
-    response_message =
-      await controllers.clansControllers.getClanDonationsDifference();
-  }
-
-  if (message.content === "!comandante") {
-    response_message =
-      "El comandante Henry es un " +
-      (await controllers.clansControllers.chooseInsult());
-  }
-
-  if (message.content === "!capital") {
-    response_message =
-      await controllers.clansControllers.getAllMembersCapitalContribution();
+  if (message.content in commandHandlers) {
+    response_message = await commandHandlers[message.content].handler();
   }
 
   if (response_message !== "") {
