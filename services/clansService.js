@@ -113,7 +113,6 @@ function getClanInformation(clanTag) {
 function getClanMembers(clanTag) {
   const url =
     process.env.URL_API + `clans/${encodeURIComponent(clanTag)}/members`;
-  console.log(`URL ${url}`);
   return fetch(url, header)
     .then((response) => response.json())
     .then((data) => {

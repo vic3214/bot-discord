@@ -22,7 +22,20 @@ client.on(Events.MessageCreate, async (message) => {
       await controllers.clansControllers.getClanDonationsDifference();
   }
 
-  message.reply(response_message);
+  if (message.content === "!comandante") {
+    response_message =
+      "El comandante Henry es un " +
+      (await controllers.clansControllers.chooseInsult());
+  }
+
+  if (message.content === "!capital") {
+    response_message =
+      await controllers.clansControllers.getAllMembersCapitalContribution();
+  }
+
+  if (response_message !== "") {
+    message.reply(response_message);
+  }
 });
 
 client.login(process.env.TOKEN_BOT);
