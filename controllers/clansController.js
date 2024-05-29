@@ -1,7 +1,7 @@
 const services = require("../services/services");
 const fs = require("fs");
 
-async function getClanMemebersList() {
+async function getClanMemebersListOrderByTrophiesDescendent() {
   let response_message = "";
   try {
     const clanMembers = await services.clans_services.getClanMembers(
@@ -9,6 +9,39 @@ async function getClanMemebersList() {
     );
 
     const members = clanMembers.items.map((member) => member.name);
+    response_message = members.join("\n");
+  } catch (error) {
+    response_message = error.message;
+  }
+
+  return response_message;
+}
+
+async function getClanMembersListAlphabeticalOrderByNameDescendent() {
+  let response_message = "";
+  try {
+    const clanMembers = await services.clans_services.getClanMembers(
+      process.env.CLAN_TAG
+    );
+
+    // Eliminar caracteres especiales para ordenar por nombre
+    const specialCharacters = /[^a-zA-Z0-9]/g;
+    const specialCharactersReplacement = "";
+    const sortedMembers = clanMembers.items.sort((a, b) => {
+      // Creamos dos strings sin caracteres especiales para comparar y no mutar las cadenas originales
+      const nameA = a.name.replace(
+        specialCharacters,
+        specialCharactersReplacement
+      );
+      const nameB = b.name.replace(
+        specialCharacters,
+        specialCharactersReplacement
+      );
+
+      return nameA.localeCompare(nameB);
+    });
+
+    const members = sortedMembers.map((member) => member.name);
     response_message = members.join("\n");
   } catch (error) {
     response_message = error.message;
@@ -85,7 +118,8 @@ async function getAllMembersCapitalContribution() {
 }
 
 module.exports = {
-  getClanMemebersList,
+  getClanMemebersListOrderByTrophiesDescendent,
+  getClanMembersListAlphabeticalOrderByNameDescendent,
   getClanDonationsDifference,
   chooseInsult,
   getAllMembersCapitalContribution,

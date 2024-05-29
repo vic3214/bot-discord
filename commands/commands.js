@@ -5,10 +5,15 @@ const commandHandlers = {
     description: "Lista de todos los comandos",
     handler: async () => await commandsHelp(),
   },
-  "!miembros": {
-    description: "Lista de miembros en orden de trofeos",
+  "!miembrosTrofeos": {
+    description: "Lista de miembros en orden descendente de trofeos",
     handler: async () =>
-      await controllers.clansControllers.getClanMemebersList(),
+      await controllers.clansControllers.getClanMemebersListOrderByTrophiesDescendent(),
+  },
+  "!miembrosAlfa": {
+    description: "Lista de miembros en orden alfabético descendente",
+    handler: async () =>
+      await controllers.clansControllers.getClanMembersListAlphabeticalOrderByNameDescendent(),
   },
   "!donaciones": {
     description:
