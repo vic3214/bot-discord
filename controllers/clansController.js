@@ -133,9 +133,9 @@ async function getCurrentWarInformation() {
     response_message = `Comienzo ->  ${formatDate(
       currentWar.startTime
     )}  /   Final ->  ${formatDate(currentWar.endTime)}  (hora Española)\n\n`;
-    response_message += `El clani  ${currentWar.clan.stars} ⭐  -  ${currentWar.opponent.stars} ⭐  ${currentWar.opponent.name} \n\n`;
-    response_message += `El clani  ${currentWar.clan.destructionPercentage}% destruido  -  ${currentWar.opponent.name}  ${currentWar.opponent.destructionPercentage}% destruido \n\n`;
-    response_message += `El clani  ${currentWar.clan.attacks} ataques  -  ${currentWar.opponent.name}  ${currentWar.opponent.attacks} ataques\n\n`;
+    response_message += `${currentWar.clan.name}  ${currentWar.clan.stars} ⭐  -  ${currentWar.opponent.stars} ⭐  ${currentWar.opponent.name} \n\n`;
+    response_message += `${currentWar.clan.name}  ${currentWar.clan.destructionPercentage}% destruido  -  ${currentWar.opponent.name}  ${currentWar.opponent.destructionPercentage}% destruido \n\n`;
+    response_message += `${currentWar.clan.name}  ${currentWar.clan.attacks} ataques  -  ${currentWar.opponent.name}  ${currentWar.opponent.attacks} ataques\n\n`;
     response_message += `Alineación:  ${warMembers.join(", ")}`;
   } catch (error) {
     response_message = error.message;

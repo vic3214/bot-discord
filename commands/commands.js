@@ -48,15 +48,31 @@ const commandHandlers = {
     handler: async () =>
       await controllers.clansControllers.getCurrentWarInformation(),
   },
+  "!actualizaDB": {
+    description: "Actualiza base de datos",
+    handler: async () => await controllers.playersControllers.updateDataBase(),
+  },
+};
+
+const commandArgumentsHandlers = {
+  "!actualizaPuntos": {
+    description:
+      "Actualiza los puntos de un integrante. Uso -> !actualizaPuntos/nombre/puntos (puntos puede ser un numero negativo o positivo)",
+    handler: async (args) =>
+      await controllers.playersControllers.updateMembersPoints(args),
+  },
 };
 
 function commandsHelp() {
-  const allCommands = Object.keys(commandHandlers).filter(
+  let allCommands = Object.keys(commandHandlers).filter(
     (key) => key !== "!ayuda"
   );
+
+  Object.keys(commandArgumentsHandlers).forEach((key) => allCommands.push(key));
+
   const commandDescriptions = allCommands.map(
     (command) => `${command} - ${commandHandlers[command].description} \n`
   );
   return commandDescriptions.join("\n");
 }
-module.exports = commandHandlers;
+module.exports = { commandHandlers, commandArgumentsHandlers };

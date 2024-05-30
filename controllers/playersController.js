@@ -1,4 +1,5 @@
 const services = require("../services/services");
+const Member = require("../models/Member");
 
 async function getHerosLevelsForAllMembers() {
   let response_message = "";
@@ -51,12 +52,9 @@ async function getClanMembersPointsTable() {
     process.env.CLAN_TAG
   );
 
-  const members = clanMembers.items.map((member) =>
-    member.name.replace(/[^\u0000-\u007F]/g, "")
-  );
+  const members = clanMembers.items.map((member) => member.name);
 
   let maxNameLength = Math.max(...members.map((member) => member.length));
-  let puntos = 10;
   let row =
     "```\n| Miembro" +
     " ".repeat(maxNameLength + 1 - "Miembro".length) +
@@ -69,19 +67,67 @@ async function getClanMembersPointsTable() {
     "-".repeat((" " + "Puntos" + " ").length) +
     "|\n";
 
-  // Iterar sobre los miembros y construir las filas de la tabla
-  for (let i = 0; i < members.length; i++) {
+  // Fetch the points for each clan member from the database
+  for (const member of members) {
+    const clanMember = await Member.findOne({ name: member });
+    const points = clanMember ? clanMember.expulsion_points : "0 ";
+
     // Nombre
-    row +=
-      "| " + members[i] + " ".repeat(maxNameLength - members[i].length) + " |";
+    row += "| " + member + " ".repeat(maxNameLength - member.length) + " |";
     // Puntos
-    row += "   " + puntos + "   |\n";
+    if (points.toString().length < 2) {
+      row += `   ${points}    |\n`;
+    } else {
+      row += `  ${points}    |\n`;
+    }
   }
   row += "```";
   return row;
 }
 
+async function updateMembersPoints(args) {
+  console.log(args);
+  const member = await Member.findOne({ name: args[0] });
+  if (!member) {
+    return "Miembro no encontrado";
+  }
+  member.expulsion_points += parseInt(args[1]);
+  await member.save();
+  return getClanMembersPointsTable();
+}
+
+async function updateDataBase() {
+  const clanMembers = await services.clans_services.getClanMembers(
+    process.env.CLAN_TAG
+  );
+  for (const member of clanMembers.items) {
+    const memberInDatabase = await Member.findOne({ tag: member.tag });
+
+    if (!memberInDatabase) {
+      await Member.create({
+        name: member.name,
+        tag: member.tag,
+        expulsionPoints: 10,
+      });
+    }
+  }
+
+  // Delete members that not are in the clan
+  const membersInDatabase = await Member.find();
+  const membersInClan = clanMembers.items.map((member) => member.tag);
+  const membersToDelete = membersInDatabase.filter(
+    (member) => !membersInClan.includes(member.tag)
+  );
+  for (const member of membersToDelete) {
+    await Member.findByIdAndDelete(member._id);
+  }
+
+  return "Base de datos actualizada";
+}
+
 module.exports = {
   getHerosLevelsForAllMembers,
   getClanMembersPointsTable,
+  updateMembersPoints,
+  updateDataBase,
 };
