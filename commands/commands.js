@@ -49,8 +49,21 @@ const commandHandlers = {
       await controllers.clansControllers.getCurrentWarInformation(),
   },
   "!actualizaDB": {
-    description: "Actualiza base de datos",
-    handler: async () => await controllers.playersControllers.updateDataBase(),
+    description: "Actualiza la base de datos",
+    handler: async () =>
+      await controllers.playersControllers.updateDataBaseMembers(),
+  },
+  "!actualizaMonedas": {
+    description:
+      "Actualiza en base de datos las monedas de la capital. Debe ejecutarse antes del primer asalto del mes",
+    handler: async () =>
+      await controllers.playersControllers.updateClanMembersAsaultsPoints(),
+  },
+  "!comparaMonedas": {
+    description:
+      "Compara los puntos de la capital obtenidos actuales con los de la base de datos",
+    handler: async () =>
+      await controllers.playersControllers.compareCapitalPoints(),
   },
 };
 
@@ -58,8 +71,8 @@ const commandArgumentsHandlers = {
   "!actualizaPuntos": {
     description:
       "Actualiza los puntos de un integrante. Uso -> !actualizaPuntos/nombre/puntos (puntos puede ser un numero negativo o positivo)",
-    handler: async (args) =>
-      await controllers.playersControllers.updateMembersPoints(args),
+    handler: async (args, roles) =>
+      await controllers.playersControllers.updateMembersPoints(args, roles),
   },
 };
 
@@ -68,11 +81,19 @@ function commandsHelp() {
     (key) => key !== "!ayuda"
   );
 
-  Object.keys(commandArgumentsHandlers).forEach((key) => allCommands.push(key));
-
-  const commandDescriptions = allCommands.map(
+  let commandDescriptions = allCommands.map(
     (command) => `${command} - ${commandHandlers[command].description} \n`
   );
+
+  let commandWithArguments = Object.keys(commandArgumentsHandlers);
+
+  commandDescriptions = commandDescriptions.concat(
+    commandWithArguments.map(
+      (command) =>
+        `${command} - ${commandArgumentsHandlers[command].description} \n`
+    )
+  );
+
   return commandDescriptions.join("\n");
 }
 module.exports = { commandHandlers, commandArgumentsHandlers };

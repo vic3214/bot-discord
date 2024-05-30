@@ -85,8 +85,11 @@ async function getClanMembersPointsTable() {
   return row;
 }
 
-async function updateMembersPoints(args) {
-  console.log(args);
+async function updateMembersPoints(args, roles) {
+  if (!roles.cache.has(process.env.COLIDER_ROLE_ID)) {
+    return "No tienes el rol necesario para ejecutar este comando";
+  }
+
   const member = await Member.findOne({ name: args[0] });
   if (!member) {
     return "Miembro no encontrado";
@@ -96,7 +99,7 @@ async function updateMembersPoints(args) {
   return getClanMembersPointsTable();
 }
 
-async function updateDataBase() {
+async function updateDataBaseMembers() {
   const clanMembers = await services.clans_services.getClanMembers(
     process.env.CLAN_TAG
   );
@@ -125,9 +128,75 @@ async function updateDataBase() {
   return "Base de datos actualizada";
 }
 
+async function updateClanMembersAsaultsPoints() {
+  const clanMembers = await services.clans_services.getClanMembers(
+    process.env.CLAN_TAG
+  );
+
+  const memberTags = clanMembers.items.map((member) => member.tag);
+  const membersInfo = await Promise.all(
+    memberTags.map((tag) => services.players_services.getPlayerInformation(tag))
+  );
+
+  const updatePromises = membersInfo.map(async (member) => {
+    const memberInDatabase = await Member.findOne({ tag: member.tag });
+    if (!memberInDatabase) {
+      return `El miembro ${member.name} no se ha encontrado, se debe actualizar la base de datos`;
+    }
+
+    memberInDatabase.monthly_capital_points = member.clanCapitalContributions;
+    await memberInDatabase.save();
+  });
+
+  await Promise.all(updatePromises);
+  return "Puntos de asalto actualizados";
+}
+
+async function compareCapitalPoints() {
+  const clanMembers = await services.clans_services.getClanMembers(
+    process.env.CLAN_TAG
+  );
+
+  const memberTags = clanMembers.items.map((member) => member.tag);
+  const [membersInfo, membersInDatabase] = await Promise.all([
+    Promise.all(
+      memberTags.map((tag) =>
+        services.players_services.getPlayerInformation(tag)
+      )
+    ),
+    Member.find({ tag: { $in: memberTags } }),
+  ]);
+
+  const membersInDatabaseByTag = membersInDatabase.reduce((acc, member) => {
+    acc[member.tag] = member;
+    return acc;
+  }, {});
+
+  const membersDifference = await Promise.all(
+    membersInfo.map(async (member) => {
+      const memberInDatabase = membersInDatabaseByTag[member.tag];
+      return {
+        name: member.name,
+        difference:
+          member.clanCapitalContributions -
+          (memberInDatabase ? memberInDatabase.monthly_capital_points : 0),
+      };
+    })
+  );
+
+  membersDifference.sort((a, b) => b.difference - a.difference);
+  const message = membersDifference
+    .map((member) => `${member.name} -> ${member.difference}`)
+    .join("\n");
+
+  return message;
+}
+
 module.exports = {
   getHerosLevelsForAllMembers,
   getClanMembersPointsTable,
   updateMembersPoints,
-  updateDataBase,
+  updateDataBaseMembers,
+  updateClanMembersAsaultsPoints,
+  compareCapitalPoints,
 };

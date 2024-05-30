@@ -17,12 +17,19 @@ client.on(Events.ClientReady, async () => {
 client.on(Events.MessageCreate, async (message) => {
   let response_message = "";
 
-  if (message.content.startsWith("!") && message.content.includes("/")) {
+  if (
+    message.content.split("/")[0] in commandArgumentsHandlers &&
+    !message.author.bot
+  ) {
     const [command, ...args] = message.content.split("/");
-    response_message = await commandArgumentsHandlers[command].handler(args);
+    const roles = message.member.roles;
+    response_message = await commandArgumentsHandlers[command].handler(
+      args,
+      roles
+    );
   }
 
-  if (message.content in commandHandlers) {
+  if (message.content in commandHandlers && !message.author.bot) {
     response_message = await commandHandlers[message.content].handler();
   }
 
