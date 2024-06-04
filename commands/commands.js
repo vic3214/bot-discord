@@ -65,6 +65,12 @@ const commandHandlers = {
     handler: async () =>
       await controllers.playersControllers.compareCapitalPoints(),
   },
+  "!requisitos": {
+    description:
+      "Muestra los requisitos que deben cumplir los miembros para la próxima liga",
+    handler: async () =>
+      await controllers.playersControllers.getNextLeagueRequirements(),
+  },
 };
 
 const commandArgumentsHandlers = {

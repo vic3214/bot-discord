@@ -1,5 +1,7 @@
 const services = require("../services/services");
 const Member = require("../models/Member");
+const heroNames = require("../enums/heroNames");
+const thHeroLevels = require("../constants/thHeroLevels");
 
 async function getHerosLevelsForAllMembers() {
   let response_message = "";
@@ -24,10 +26,14 @@ async function getHerosLevelsForAllMembers() {
         })
         .map((hero) => {
           // Rename heroes
-          if (hero.name === "Barbarian King") hero.name = "K";
-          else if (hero.name === "Archer Queen") hero.name = "Q";
-          else if (hero.name === "Grand Warden") hero.name = "C";
-          else if (hero.name === "Royal Champion") hero.name = "L";
+          if (hero.name === "Barbarian King")
+            hero.name = heroNames.BarbarianKing;
+          else if (hero.name === "Archer Queen")
+            hero.name = heroNames.ArcherQueen;
+          else if (hero.name === "Grand Warden")
+            hero.name = heroNames.GrandWarden;
+          else if (hero.name === "Royal Champion")
+            hero.name = heroNames.RoyalChampion;
 
           return `${hero.name} ${hero.level} `;
         });
@@ -192,6 +198,156 @@ async function compareCapitalPoints() {
   return message;
 }
 
+function getWardenLevel(member) {
+  const wardenMaxLevel = thHeroLevels[member.townHallLevel].Warden.maxLevel;
+  const memberWardenLevel = member.heroes[2] ? member.heroes[2].level : 0;
+
+  if (memberWardenLevel > 0) {
+    if (wardenMaxLevel - memberWardenLevel === 0) {
+      return member.heroes[2].level;
+    } else if (
+      wardenMaxLevel - memberWardenLevel <
+      thHeroLevels[member.townHallLevel].Upgrade
+    ) {
+      return member.heroes[2].level + (wardenMaxLevel - memberWardenLevel);
+    } else {
+      return (
+        member.heroes[2].level + thHeroLevels[member.townHallLevel].Upgrade
+      );
+    }
+  } else if (!member.heroes[2] && wardenMaxLevel > 0) {
+    return 4;
+  }
+
+  return 0;
+}
+
+function getRoyalLevel(member) {
+  const royalMaxLevel = thHeroLevels[member.townHallLevel].Royal.maxLevel;
+  const memberRoyalLevel = member.heroes[4] ? member.heroes[4].level : 0;
+
+  if (memberRoyalLevel > 0) {
+    if (royalMaxLevel - memberRoyalLevel === 0) {
+      return member.heroes[4].level;
+    } else if (
+      royalMaxLevel - memberRoyalLevel <
+      thHeroLevels[member.townHallLevel].Upgrade
+    ) {
+      return member.heroes[4].level + (royalMaxLevel - memberRoyalLevel);
+    } else {
+      return (
+        member.heroes[4].level + thHeroLevels[member.townHallLevel].Upgrade
+      );
+    }
+  } else if (!member.heroes[4] && royalMaxLevel > 0) {
+    return 4;
+  }
+
+  return 0;
+}
+
+function getQueenLevel(member) {
+  const queenMaxLevel = thHeroLevels[member.townHallLevel].Queen.maxLevel;
+  const wardenMaxLevel = thHeroLevels[member.townHallLevel].Warden.maxLevel;
+  const memberQueenLevel = member.heroes[1] ? member.heroes[1].level : 0;
+  const memberWardenLevel = member.heroes[2] ? member.heroes[2].level : 0;
+
+  if (
+    memberQueenLevel > 0 &&
+    (wardenMaxLevel - memberWardenLevel === 0 || wardenMaxLevel === 0)
+  ) {
+    if (queenMaxLevel - memberQueenLevel === 0) {
+      return member.heroes[1].level;
+    } else if (
+      queenMaxLevel - memberQueenLevel <
+      thHeroLevels[member.townHallLevel].Upgrade
+    ) {
+      return member.heroes[1].level + (queenMaxLevel - memberQueenLevel);
+    } else {
+      return (
+        member.heroes[1].level + thHeroLevels[member.townHallLevel].Upgrade
+      );
+    }
+  } else if (member.heroes[1]) {
+    return member.heroes[1].level;
+  } else if (!member.heroes[1] && queenMaxLevel > 0) {
+    return 4;
+  }
+
+  return 0;
+}
+
+function getKingLevel(member) {
+  const kingMaxLevel = thHeroLevels[member.townHallLevel].King.maxLevel;
+  const wardenMaxLevel = thHeroLevels[member.townHallLevel].Warden.maxLevel;
+  const royalMaxLevel = thHeroLevels[member.townHallLevel].Royal.maxLevel;
+  const memberKingLevel = member.heroes[0] ? member.heroes[0].level : 0;
+  const memberWardenLevel = member.heroes[2] ? member.heroes[2].level : 0;
+  const memberRoyalLevel = member.heroes[4] ? member.heroes[4].level : 0;
+
+  if (
+    memberKingLevel > 0 &&
+    (wardenMaxLevel - memberWardenLevel === 0 || wardenMaxLevel === 0) &&
+    (royalMaxLevel === 0 || royalMaxLevel - memberRoyalLevel === 0)
+  ) {
+    if (kingMaxLevel - memberKingLevel === 0) {
+      return member.heroes[0].level;
+    } else if (
+      kingMaxLevel - memberKingLevel <
+      thHeroLevels[member.townHallLevel].Upgrade
+    ) {
+      return member.heroes[0].level + (kingMaxLevel - memberKingLevel);
+    } else {
+      return (
+        member.heroes[0].level + thHeroLevels[member.townHallLevel].Upgrade
+      );
+    }
+  } else if (member.heroes[0]) {
+    return member.heroes[0].level;
+  } else if (!member.heroes[0] && kingMaxLevel > 0) {
+    return 4;
+  }
+
+  return 0;
+}
+
+function formatMemberInfo(member) {
+  return `${member.name} -> ${member.thLevel} |${member.kingLevel}| ${
+    member.queenLevel
+  }| ${member.wardenLevel}| ${
+    member.royalLevel
+  }| ${member.capital.toLocaleString("es-ES")}`;
+}
+
+async function getNextLeagueRequirements() {
+  const clanMembers = await services.clans_services.getClanMembers(
+    process.env.CLAN_TAG
+  );
+  const memberTags = clanMembers.items.map((member) => member.tag);
+  const membersInfo = await Promise.all(
+    memberTags.map((tag) => services.players_services.getPlayerInformation(tag))
+  );
+
+  const members = membersInfo
+    .map((member) => ({
+      name: member.name,
+      thLevel: member.townHallLevel,
+      kingLevel: getKingLevel(member),
+      queenLevel: getQueenLevel(member),
+      wardenLevel: getWardenLevel(member),
+      royalLevel: getRoyalLevel(member),
+      capital: member.clanCapitalContributions + 64_000,
+    }))
+    .sort((a, b) => b.thLevel - a.thLevel);
+
+  const message =
+    `Miembro | Th | Rey | Reina | Centinela | Luchadora | Medallas\n` +
+    members.map(formatMemberInfo).join("\n");
+  console.log(message);
+  console.log(message.length);
+  return message;
+}
+
 module.exports = {
   getHerosLevelsForAllMembers,
   getClanMembersPointsTable,
@@ -199,4 +355,5 @@ module.exports = {
   updateDataBaseMembers,
   updateClanMembersAsaultsPoints,
   compareCapitalPoints,
+  getNextLeagueRequirements,
 };

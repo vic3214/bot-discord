@@ -118,6 +118,7 @@ async function getAllMembersCapitalContribution() {
   return response_message;
 }
 
+// TODO: Controlar excepcion cuando no hay guerra
 async function getCurrentWarInformation() {
   let response_message = "";
   try {

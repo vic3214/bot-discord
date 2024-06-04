@@ -1,0 +1,46 @@
+1. Prioridad de mejora -> Centinela, Luchadora, Reina, Rey
+2. Sumar niveles solo a dos heroes según nivel de ayuntamiento
+
+-----------------------------
+Nivel 11 -> mejora 4 niveles
+Nivel 12 -> mejora 4 niveles
+Nivel 13 -> mejora 4 niveles
+Nivel 14 -> mejora 3 niveles
+Nivel 15 -> mejora 2 niveles
+Nivel 16 -> mejora 1 niveles
+-----------------------------
+
+3.Centinela (Warden):
+    3.1. Si el centinela está disponible en el nivel de ayuntamiento:
+        3.1.1.Si el nivel maximo del centinela - nivel actual de centinela = 0 devolver nivel centinela
+        3.1.2.Si no el nivel maximo del centinela - nivel actual de centinela menor que nivel de mejora, sumar esa diferencia al nivel actual
+        3.1.3.Si no el nivel maximo del centinela - nivel actual de centinela menor que nivel de mejora, sumar nivel de mejora al nivel actual
+    3.2 Si no el nivel maximo del centinela para el ayuntamiento es mayor que 0 sumar 4 al nivel del centinela (recién construido)
+    3.3. Si no devolver 0. (No disponible en su ayuntamiento)
+
+4.Luchadora (Royal):
+    4.1. Si la luchadora está disponible en el nivel de ayuntamiento:
+        4.1.1.Si el nivel maximo de la luchadora - nivel actual de luchadora = 0 devolver nivel luchadora
+        4.1.2.Si el nivel maximo de la luchadora - nivel actual de luchadora menor que nivel de mejora, sumar esa diferencia al nivel
+        4.1.3.Si el nivel maximo de la luchadora - nivel actual de luchadora menor que nivel de mejora, sumar nivel de mejora al nivel actual
+    4.2 Si el nivel maximo de la luchadora para el ayuntamiento es mayor que 0 sumar 4 al nivel de la luchadora (recién construido)
+    4.3. Sino devolver 0. (No disponible en su ayuntamiento)
+
+5.Reina (Queen):
+    5.1 Si la reina está disponible en el nivel de ayuntamiento, el centinela ha sido mejorado al máximo o no está disponible en ese ayuntamiento:
+        5.1.1.Si el nivel maximo de la reina - nivel actual de reina = 0 devolver nivel reina
+        5.1.2.Si el nivel maximo de la reina - nivel actual de reina menor que nivel de mejora, sumar esa diferencia al nivel
+        5.1.3.Si el nivel maximo de la reina - nivel actual de reina menor que nivel de mejora, sumar nivel de mejora al nivel actual
+    5.2 Si el miembro tiene la reina devolver el nivel de la reina (centinela no está al maximo y tiene prioridad, no se sube el nivel)
+    5.3 Si el nivel maximo de la reina para el ayuntamiento es mayor que 0 sumar 4 al nivel de la reina (recién construido)
+    5.4 Sino devolver 0. (No disponible en su ayuntamiento)
+
+6.Rey (King):
+    6.1 Si el rey está disponible en el nivel de ayuntamiento, el centinela ha sido mejorado al máximo o no está disponible en ese ayuntamiento y 
+    la luchadora ha sido mejorada al máximo o no está disponible en ese ayuntamiento:
+        6.1.1.Si el nivel maximo del rey - nivel actual del rey = 0 devolver nivel rey
+        6.1.2.Si el nivel maximo del rey - nivel actual del rey menor que nivel de mejora, sumar esa diferencia al nivel
+        6.1.3.Si el nivel maximo del rey - nivel actual del rey menor que nivel de mejora, sumar nivel de mejora al nivel actual
+    6.2 Si el miembro tiene el rey devolver el nivel del rey (centinela y luchadora no están al maximo y tienen prioridad, no se sube el nivel)
+    6.3 Si el nivel maximo del rey para el ayuntamiento es mayor que 0 sumar 4 al nivel del rey (recién construido)
+    6.4 Sino devolver 0. (No disponible en su ayuntamiento)
