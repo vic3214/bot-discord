@@ -46,7 +46,7 @@ function getLeagueGroup(clanTag) {
     });
 }
 
-function getClanWarInformation(warTag) {
+function getClanLeagueWarInformation(warTag) {
   const url =
     process.env.URL_API + `clanwarleagues/wars/${encodeURIComponent(warTag)}`;
   return fetch(url, header)
@@ -141,7 +141,7 @@ module.exports = {
   getCapitalRaidSeasons,
   getClanInformation,
   getClanMembers,
-  getClanWarInformation,
+  getClanLeagueWarInformation,
   getClanWarLog,
   getCurrentWarInformation,
   getLeagueGroup,

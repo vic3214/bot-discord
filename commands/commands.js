@@ -8,12 +8,12 @@ const commandHandlers = {
   "!miembrosTrofeos": {
     description: "Lista de miembros en orden descendente de trofeos",
     handler: async () =>
-      await controllers.clansControllers.getClanMemebersListOrderByTrophiesDescendent(),
+      await controllers.clansControllers.getClanMembersListOrderByTrophiesDescendent(),
   },
   "!miembrosAlfa": {
     description: "Lista de miembros en orden alfabético descendente",
     handler: async () =>
-      await controllers.clansControllers.getClanMembersListAlphabeticalOrderByNameDescendent(),
+      await controllers.clansControllers.getClanMembersListOrderByNameDescending(),
   },
   "!donaciones": {
     description:
@@ -44,7 +44,7 @@ const commandHandlers = {
       await controllers.playersControllers.getClanMembersPointsTable(),
   },
   "!guerra": {
-    description: "Información sobre la guerra actual",
+    description: "Información sobre la guerra actual (No liga)",
     handler: async () =>
       await controllers.clansControllers.getCurrentWarInformation(),
   },
@@ -70,6 +70,16 @@ const commandHandlers = {
       "Muestra los requisitos que deben cumplir los miembros para la próxima liga",
     handler: async () =>
       await controllers.playersControllers.getNextLeagueRequirements(),
+  },
+  "!clasificacion": {
+    description: "Muestra la clasificación actual de la liga",
+    handler: async () =>
+      await controllers.clansControllers.getClanLeagueClassification(),
+  },
+  "!liga": {
+    description: "Información sobre la guerra actual de la liga",
+    handler: async () =>
+      await controllers.clansControllers.getCurrentLeagueWar(),
   },
 };
 

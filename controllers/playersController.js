@@ -343,8 +343,6 @@ async function getNextLeagueRequirements() {
   const message =
     `Miembro | Th | Rey | Reina | Centinela | Luchadora | Medallas\n` +
     members.map(formatMemberInfo).join("\n");
-  console.log(message);
-  console.log(message.length);
   return message;
 }
 
