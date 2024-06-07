@@ -110,12 +110,10 @@ async function updateDataBaseMembers() {
     const clanTag = process.env.CLAN_TAG;
     const clanMembers = await services.clans_services.getClanMembers(clanTag);
     const membersInDatabase = await Member.find();
-    console.log(membersInDatabase);
     const membersInClan = new Set(
       clanMembers.items.map((member) => member.tag)
     );
-    console.log(membersInClan);
-    // Update existing members or create new ones
+
     const updatePromises = clanMembers.items.map(async (member) => {
       const memberInDatabase = membersInDatabase.find(
         (m) => m.tag === member.tag
@@ -123,10 +121,9 @@ async function updateDataBaseMembers() {
       const capitalPoints = await services.players_services
         .getPlayerInformation(member.tag)
         .then((player) => player.clanCapitalContributions);
-      console.log(member.name, capitalPoints);
 
+      // Si el miembro no está en la base de datos se añade
       if (!memberInDatabase) {
-        // Create new member
         const newMember = new Member({
           name: member.name,
           tag: member.tag,
@@ -140,7 +137,7 @@ async function updateDataBaseMembers() {
 
     await Promise.all(updatePromises);
 
-    // Delete members that are not in the clan
+    // Se borrarán los miembros que no estén en el clan
     const membersToDelete = membersInDatabase.filter(
       (member) => !membersInClan.has(member.tag)
     );
