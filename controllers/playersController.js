@@ -106,32 +106,53 @@ async function updateMembersPoints(args, roles) {
 }
 
 async function updateDataBaseMembers() {
-  const clanMembers = await services.clans_services.getClanMembers(
-    process.env.CLAN_TAG
-  );
-  for (const member of clanMembers.items) {
-    const memberInDatabase = await Member.findOne({ tag: member.tag });
+  try {
+    const clanTag = process.env.CLAN_TAG;
+    const clanMembers = await services.clans_services.getClanMembers(clanTag);
+    const membersInDatabase = await Member.find();
+    console.log(membersInDatabase);
+    const membersInClan = new Set(
+      clanMembers.items.map((member) => member.tag)
+    );
+    console.log(membersInClan);
+    // Update existing members or create new ones
+    const updatePromises = clanMembers.items.map(async (member) => {
+      const memberInDatabase = membersInDatabase.find(
+        (m) => m.tag === member.tag
+      );
+      const capitalPoints = await services.players_services
+        .getPlayerInformation(member.tag)
+        .then((player) => player.clanCapitalContributions);
+      console.log(member.name, capitalPoints);
 
-    if (!memberInDatabase) {
-      await Member.create({
-        name: member.name,
-        tag: member.tag,
-        expulsionPoints: 10,
-      });
-    }
+      if (!memberInDatabase) {
+        // Create new member
+        const newMember = new Member({
+          name: member.name,
+          tag: member.tag,
+          expulsionPoints: 10,
+          monthly_capital_points: capitalPoints,
+          stars_per_attack: 0,
+        });
+        await newMember.save();
+      }
+    });
+
+    await Promise.all(updatePromises);
+
+    // Delete members that are not in the clan
+    const membersToDelete = membersInDatabase.filter(
+      (member) => !membersInClan.has(member.tag)
+    );
+    await Member.deleteMany({
+      tag: { $in: membersToDelete.map((m) => m.tag) },
+    });
+
+    return "Base de datos actualizada";
+  } catch (error) {
+    console.error("Error al actualizar los miembros:", error);
+    throw error;
   }
-
-  // Delete members that not are in the clan
-  const membersInDatabase = await Member.find();
-  const membersInClan = clanMembers.items.map((member) => member.tag);
-  const membersToDelete = membersInDatabase.filter(
-    (member) => !membersInClan.includes(member.tag)
-  );
-  for (const member of membersToDelete) {
-    await Member.findByIdAndDelete(member._id);
-  }
-
-  return "Base de datos actualizada";
 }
 
 async function updateClanMembersAsaultsPoints() {
