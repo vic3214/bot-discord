@@ -175,6 +175,8 @@ async function getClanLeagueClassification() {
 async function getCurrentLeagueWar() {
   try {
     const clanTag = process.env.CLAN_TAG;
+    console.log(process.env.CLAN_TAG);
+    console.log(clanTag);
     const leagueGroup = await services.clans_services.getLeagueGroup(clanTag);
 
     if (!leagueGroup.rounds) {
@@ -204,8 +206,11 @@ async function getCurrentLeagueWar() {
       currentWar,
       clanTag
     );
-
-    return constructLeagueWarMessage(currentWar, membersWithoutAttacks);
+    return constructLeagueWarMessage(
+      currentWar,
+      membersWithoutAttacks,
+      clanTag
+    );
   } catch (error) {
     return error.message;
   }
@@ -219,7 +224,7 @@ function getCurrentWarMembersWithoutAttacks(currentWar, clanTag) {
   }
 }
 
-function constructLeagueWarMessage(currentWar, membersWithoutAttacks) {
+function constructLeagueWarMessage(currentWar, membersWithoutAttacks, clanTag) {
   let message = `Comienzo -> ${formatDate(
     currentWar.startTime
   )} / Final -> ${formatDate(currentWar.endTime)} (hora Española)\n\n`;
