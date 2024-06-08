@@ -175,8 +175,6 @@ async function getClanLeagueClassification() {
 async function getCurrentLeagueWar() {
   try {
     const clanTag = process.env.CLAN_TAG;
-    console.log(process.env.CLAN_TAG);
-    console.log(clanTag);
     const leagueGroup = await services.clans_services.getLeagueGroup(clanTag);
 
     if (!leagueGroup.rounds) {

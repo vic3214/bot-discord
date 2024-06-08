@@ -4,53 +4,46 @@ const heroNames = require("../enums/heroNames");
 const thHeroLevels = require("../constants/thHeroLevels");
 
 async function getHerosLevelsForAllMembers() {
-  let response_message = "";
   try {
     const clanMembers = await services.clans_services.getClanMembers(
       process.env.CLAN_TAG
     );
-
-    const playerPromises = clanMembers.items.map((member) =>
-      services.players_services.getPlayerInformation(member.tag)
+    const membersInfo = await Promise.all(
+      clanMembers.items.map(async (member) => {
+        const playerInfo = await services.players_services.getPlayerInformation(
+          member.tag
+        );
+        return {
+          name: playerInfo.name,
+          heroes: playerInfo.heroes
+            .filter(
+              (hero) => !["Battle Machine", "Battle Copter"].includes(hero.name)
+            )
+            .map((hero) => {
+              const heroName =
+                heroNames[
+                  {
+                    "Barbarian King": "BarbarianKing",
+                    "Archer Queen": "ArcherQueen",
+                    "Grand Warden": "GrandWarden",
+                    "Royal Champion": "RoyalChampion",
+                  }[hero.name] || hero.name
+                ];
+              return `${heroName} ${hero.level}`;
+            }),
+        };
+      })
     );
 
-    const membersInfo = await Promise.all(playerPromises);
+    const response_message = membersInfo
+      .filter((member) => member.heroes.length > 0)
+      .map((member) => `${member.name} -> ${member.heroes.join(" | ")}`)
+      .join("\n");
 
-    const members = membersInfo.reduce((acc, member) => {
-      const heroesInfo = member.heroes
-        .filter((hero) => {
-          // Ignore Battle Machine and Battle Copter
-          return (
-            hero.name !== "Battle Machine" && hero.name !== "Battle Copter"
-          );
-        })
-        .map((hero) => {
-          // Rename heroes
-          if (hero.name === "Barbarian King")
-            hero.name = heroNames.BarbarianKing;
-          else if (hero.name === "Archer Queen")
-            hero.name = heroNames.ArcherQueen;
-          else if (hero.name === "Grand Warden")
-            hero.name = heroNames.GrandWarden;
-          else if (hero.name === "Royal Champion")
-            hero.name = heroNames.RoyalChampion;
-
-          return `${hero.name} ${hero.level} `;
-        });
-
-      if (heroesInfo.length > 0) {
-        acc.push(`${member.name} -> ${heroesInfo}`);
-      }
-
-      return acc;
-    }, []);
-
-    response_message = members.join("\n");
+    return response_message;
   } catch (error) {
-    response_message = error.message;
+    return error.message;
   }
-
-  return response_message;
 }
 
 async function getClanMembersPointsTable() {
@@ -147,8 +140,7 @@ async function updateDataBaseMembers() {
 
     return "Base de datos actualizada";
   } catch (error) {
-    console.error("Error al actualizar los miembros:", error);
-    throw error;
+    return `Error al actualizar los miembros: ${error}`;
   }
 }
 
