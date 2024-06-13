@@ -2,6 +2,7 @@ const services = require("../services/services");
 const Member = require("../models/Member");
 const heroNames = require("../enums/heroNames");
 const thHeroLevels = require("../constants/thHeroLevels");
+const clansControllers = require("../controllers/clansController");
 
 async function getHerosLevelsForAllMembers() {
   try {
@@ -122,7 +123,8 @@ async function updateDataBaseMembers() {
           tag: member.tag,
           expulsionPoints: 10,
           monthly_capital_points: capitalPoints,
-          stars_per_attack: 0,
+          league_attacks: 0,
+          league_stars: 0,
         });
         await newMember.save();
       }
@@ -356,6 +358,22 @@ async function getNextLeagueRequirements() {
   return message;
 }
 
+async function updateMemberLeagueAttack(args, roles) {
+  if (!roles.cache.has(process.env.COLIDER_ROLE_ID)) {
+    return "No tienes el rol necesario para ejecutar este comando";
+  }
+
+  const member = await Member.findOne({ name: args[0] });
+  if (!member) {
+    return "Miembro no encontrado";
+  }
+
+  member.league_stars += parseInt(args[1]);
+  member.league_attacks += 1;
+  await member.save();
+  return clansControllers.getMedianLeagueAttacksForAllMembers();
+}
+
 module.exports = {
   getHerosLevelsForAllMembers,
   getClanMembersPointsTable,
@@ -364,4 +382,5 @@ module.exports = {
   updateClanMembersAsaultsPoints,
   compareCapitalPoints,
   getNextLeagueRequirements,
+  updateMemberLeagueAttack,
 };

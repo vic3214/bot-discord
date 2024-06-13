@@ -2,10 +2,10 @@
 2. Sumar niveles solo a dos heroes según nivel de ayuntamiento
 
 -----------------------------
-Nivel 11 -> mejora 4 niveles
-Nivel 12 -> mejora 4 niveles
-Nivel 13 -> mejora 4 niveles
-Nivel 14 -> mejora 3 niveles
+Nivel 11 -> mejora 3 niveles
+Nivel 12 -> mejora 3 niveles
+Nivel 13 -> mejora 3 niveles
+Nivel 14 -> mejora 2 niveles
 Nivel 15 -> mejora 2 niveles
 Nivel 16 -> mejora 1 niveles
 -----------------------------

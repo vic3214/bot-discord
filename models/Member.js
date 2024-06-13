@@ -18,7 +18,11 @@ const MemberSchema = Schema({
     type: Number,
     default: 0,
   },
-  stars_per_attack: {
+  league_attacks: {
+    type: Number,
+    default: 0,
+  },
+  league_stars: {
     type: Number,
     default: 0,
   },

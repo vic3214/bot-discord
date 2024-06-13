@@ -81,6 +81,11 @@ const commandHandlers = {
     handler: async () =>
       await controllers.clansControllers.getCurrentLeagueWar(),
   },
+  "!ataques": {
+    description: "Informacón sobre la media de los ataques en liga",
+    handler: async () =>
+      await controllers.clansControllers.getMedianLeagueAttacksForAllMembers(),
+  },
 };
 
 const commandArgumentsHandlers = {
@@ -89,6 +94,15 @@ const commandArgumentsHandlers = {
       "Actualiza los puntos de un integrante. Uso -> !actualizaPuntos/nombre/puntos (puntos puede ser un numero negativo o positivo)",
     handler: async (args, roles) =>
       await controllers.playersControllers.updateMembersPoints(args, roles),
+  },
+  "!actualizaAtaques": {
+    description:
+      "Actualiza las estrellas de liga de un integrante. Uso -> !actualizaAtaques/nombre/estrellas",
+    handler: async (args, roles) =>
+      await controllers.playersControllers.updateMemberLeagueAttack(
+        args,
+        roles
+      ),
   },
 };
 

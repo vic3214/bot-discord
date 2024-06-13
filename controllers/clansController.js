@@ -2,7 +2,7 @@ const services = require("../services/services");
 const fs = require("fs");
 const moment = require("moment");
 const warStates = require("../enums/warStates");
-
+const Member = require("../models/Member");
 async function getClanMembersListOrderByTrophiesDescendent() {
   try {
     const clanTag = process.env.CLAN_TAG;
@@ -332,6 +332,35 @@ function constructLeagueClassificationMessage(sortedWarData) {
   return message;
 }
 
+async function getMedianLeagueAttacksForAllMembers() {
+  const membersInDatabase = await Member.find();
+
+  // Obtiene los league_attacks y league_stars de cada miembro y calcula la media, y el nombre
+  const membersInfo = membersInDatabase.map((member) => ({
+    name: member.name,
+    attacks: member.league_attacks,
+    stars: member.league_stars,
+    median: (member.league_attacks + member.league_stars) / 2,
+  }));
+
+  // Encuentra el nombre más largo para determinar el ancho de la columna
+  const maxNameLength = Math.max(...membersInfo.map(({ name }) => name.length));
+
+  // Devuelve una tabla formada por el nombre, los ataques, las estrellas y la media de cada miembro
+  let response_message = "";
+  response_message +=
+    "Nombre".padEnd(maxNameLength + 1) +
+    ` | ${"⚔️".padEnd(4)} | ${"⭐".padEnd(4)} | Media\n`;
+  response_message += "-".repeat(maxNameLength + 23) + "\n";
+  for (const { name, attacks, stars, median } of membersInfo) {
+    response_message += `${name.padEnd(maxNameLength + 1)} | ${attacks
+      .toString()
+      .padEnd(4)} | ${stars.toString().padEnd(4)} | ${median.toFixed(2)}\n`;
+  }
+  console.log(response_message.length);
+  return response_message;
+}
+
 module.exports = {
   getClanMembersListOrderByTrophiesDescendent,
   getClanMembersListOrderByNameDescending,
@@ -341,4 +370,5 @@ module.exports = {
   getCurrentWarInformation,
   getClanLeagueClassification,
   getCurrentLeagueWar,
+  getMedianLeagueAttacksForAllMembers,
 };
