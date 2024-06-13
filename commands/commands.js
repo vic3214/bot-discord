@@ -84,7 +84,7 @@ const commandHandlers = {
   "!ataques": {
     description: "Informacón sobre la media de los ataques en liga",
     handler: async () =>
-      await controllers.clansControllers.getMedianLeagueAttacksForAllMembers(),
+      await controllers.clansControllers.getLeagueAttacksRatingForAllMembers(),
   },
 };
 

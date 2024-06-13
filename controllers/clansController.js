@@ -332,33 +332,65 @@ function constructLeagueClassificationMessage(sortedWarData) {
   return message;
 }
 
-async function getMedianLeagueAttacksForAllMembers() {
+async function getLeagueAttacksRatingForAllMembers() {
   const membersInDatabase = await Member.find();
 
-  // Obtiene los league_attacks y league_stars de cada miembro y calcula la media, y el nombre
   const membersInfo = membersInDatabase.map((member) => ({
     name: member.name,
     attacks: member.league_attacks,
     stars: member.league_stars,
-    median: (member.league_attacks + member.league_stars) / 2,
+    median:
+      member.league_attacks === 0
+        ? 0
+        : member.league_stars / member.league_attacks,
   }));
 
-  // Encuentra el nombre más largo para determinar el ancho de la columna
-  const maxNameLength = Math.max(...membersInfo.map(({ name }) => name.length));
+  membersInfo.sort((a, b) => b.median - a.median);
 
-  // Devuelve una tabla formada por el nombre, los ataques, las estrellas y la media de cada miembro
-  let response_message = "";
-  response_message +=
-    "Nombre".padEnd(maxNameLength + 1) +
-    ` | ${"⚔️".padEnd(4)} | ${"⭐".padEnd(4)} | Media\n`;
-  response_message += "-".repeat(maxNameLength + 23) + "\n";
-  for (const { name, attacks, stars, median } of membersInfo) {
-    response_message += `${name.padEnd(maxNameLength + 1)} | ${attacks
-      .toString()
-      .padEnd(4)} | ${stars.toString().padEnd(4)} | ${median.toFixed(2)}\n`;
+  let maxNameLength = Math.max(
+    ...membersInfo.map((member) => member.name.length)
+  );
+
+  const maxAttacksLength = Math.max(
+    ...membersInfo.map((member) => member.attacks.toString().length)
+  );
+  const maxStarsLength = Math.max(
+    ...membersInfo.map((member) => member.stars.toString().length)
+  );
+  const maxMedianLength = Math.max(
+    ...membersInfo.map((member) => member.median.toFixed(2).length)
+  );
+
+  const headerRow =
+    "```" +
+    `\n| Miembro${" ".repeat(
+      maxNameLength - "Miembro".length
+    )} | ⚔️ | ⭐ | ⭐/⚔️  `;
+  const separatorRow = `|${"-".repeat(maxNameLength + 2)}|${"-".repeat(
+    4
+  )}|${"-".repeat(4)}|${"-".repeat(6)}|`;
+
+  let row = headerRow + "\n" + separatorRow + "\n";
+
+  // Construir la tabla
+  for (const member of membersInfo) {
+    row += `| ${member.name.padEnd(maxNameLength)} | ${centrarTexto(
+      member.attacks.toString(),
+      maxAttacksLength
+    )} | ${centrarTexto(
+      member.stars.toString(),
+      maxStarsLength
+    )} | ${centrarTexto(member.median.toFixed(2), maxMedianLength)} |\n`;
   }
-  console.log(response_message.length);
-  return response_message;
+  row += "```";
+  return row;
+}
+
+function centrarTexto(texto, ancho) {
+  let espaciosTotales = ancho - texto.length;
+  let espaciosAntes = Math.floor(espaciosTotales / 2);
+  let espaciosDespues = espaciosTotales - espaciosAntes;
+  return " ".repeat(espaciosAntes) + texto + " ".repeat(espaciosDespues);
 }
 
 module.exports = {
@@ -370,5 +402,5 @@ module.exports = {
   getCurrentWarInformation,
   getClanLeagueClassification,
   getCurrentLeagueWar,
-  getMedianLeagueAttacksForAllMembers,
+  getLeagueAttacksRatingForAllMembers,
 };
