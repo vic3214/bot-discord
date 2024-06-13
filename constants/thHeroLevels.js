@@ -12,7 +12,7 @@ const thHeroLevels = {
     Royal: {
       maxLevel: 0,
     },
-    Upgrade: 4,
+    Upgrade: 3,
   },
   12: {
     Queen: {
@@ -27,7 +27,7 @@ const thHeroLevels = {
     Royal: {
       maxLevel: 0,
     },
-    Upgrade: 4,
+    Upgrade: 3,
   },
   13: {
     Queen: {
@@ -42,7 +42,7 @@ const thHeroLevels = {
     Royal: {
       maxLevel: 25,
     },
-    Upgrade: 4,
+    Upgrade: 3,
   },
   14: {
     Queen: {
@@ -57,7 +57,7 @@ const thHeroLevels = {
     Royal: {
       maxLevel: 30,
     },
-    Upgrade: 3,
+    Upgrade: 2,
   },
   15: {
     Queen: {
